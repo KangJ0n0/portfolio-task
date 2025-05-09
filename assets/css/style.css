@@ -460,13 +460,18 @@ nav {
     text-align: center;
   }
 
-  .greeting::before {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
   .greeting {
     padding-left: 0;
+    padding-bottom: 15px; /* Add space below instead */
+  }
+
+  .greeting::before {
+    /* Change the line to appear below the text instead of to the left */
+    left: 50%;
+    top: auto;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 40px; /* Make the line a bit wider */
   }
 
   .home-text h1 {
