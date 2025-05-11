@@ -4,7 +4,6 @@ const navLinks = document.querySelectorAll(".nav-links a");
 const sections = document.querySelectorAll(".section");
 const hamburger = document.querySelector(".hamburger");
 const navMenu = document.querySelector(".nav-links");
-const contactForm = document.getElementById("contactForm");
 const cursor = document.querySelector(".cursor");
 const cursorFollower = document.querySelector(".cursor-follower");
 
@@ -17,6 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadComponent("projects-container", "components/projects.html");
   loadComponent("contact-container", "components/contact.html");
   loadComponent("footer-container", "components/footer.html");
+
+  // Initialize contact form after components are loaded
+  setTimeout(initContactForm, 1000);
 });
 
 // Function to load HTML components
@@ -25,10 +27,78 @@ function loadComponent(containerId, componentPath) {
     .then((response) => response.text())
     .then((html) => {
       document.getElementById(containerId).innerHTML = html;
+
+      // If this is the contact component, initialize the form
+      if (containerId === "contact-container") {
+        setTimeout(initContactForm, 100);
+      }
     })
     .catch((error) => {
       console.error(`Error loading component ${componentPath}:`, error);
     });
+}
+
+// Initialize contact form with mailto functionality
+function initContactForm() {
+  const contactForm = document.getElementById("contactForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const formStatus = document.getElementById("formStatus");
+
+  if (contactForm && submitBtn) {
+    // Change button type to button to prevent form submission
+    submitBtn.type = "button";
+
+    // Add click event to the submit button
+    submitBtn.addEventListener("click", () => {
+      // Get form values
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      // Validate form
+      if (!name || !email || !subject || !message) {
+        showFormStatus("Please fill in all fields", "error");
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showFormStatus("Please enter a valid email address", "error");
+        return;
+      }
+
+      // Create mailto link with form data
+      const mailtoLink = `mailto:afifthaarvi@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)}`;
+
+      // Open email client
+      window.location.href = mailtoLink;
+
+      // Show success message
+      showFormStatus("Opening your email client...", "success");
+
+      // Reset form after a delay
+      setTimeout(() => {
+        contactForm.reset();
+        if (formStatus) formStatus.className = "form-status";
+      }, 3000);
+    });
+  }
+
+  // Helper function to show form status
+  function showFormStatus(message, type) {
+    if (formStatus) {
+      formStatus.textContent = message;
+      formStatus.className = "form-status";
+
+      if (type) {
+        formStatus.classList.add(type);
+      }
+    } else {
+      alert(message);
+    }
+  }
 }
 
 // Custom cursor
@@ -127,27 +197,6 @@ navLinks.forEach((link) => {
       behavior: "smooth",
     });
   });
-});
-
-// Form submission
-contactForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  // Get form values
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const subject = document.getElementById("subject").value;
-  const message = document.getElementById("message").value;
-
-  // Here you would typically send the form data to a server
-  // For this example, we'll just log it and show a success message
-  console.log("Form submitted:", { name, email, subject, message });
-
-  // Show success message (in a real application, you'd want to handle this better)
-  alert("Thank you for your message! I will get back to you soon.");
-
-  // Reset form
-  contactForm.reset();
 });
 
 // Add animation on scroll
